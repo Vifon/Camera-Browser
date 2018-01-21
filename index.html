@@ -23,7 +23,7 @@
               <input type="checkbox"
                      v-model="file.checked"
                      :value="file.name">
-              <a :href="'api1/' + file.name">{{ file.name }}</a>
+              <a :href="'files/' + file.name">{{ file.name }}</a>
             </label>
           </li>
         </ul>
@@ -50,15 +50,13 @@
      },
      methods: {
        getFiles: function () {
-         this.$http.get("api1/")
+         this.$http.get("v1/")
              .then(
                response => {
-                 this.files = response.body.files.map(f => {
-                   return {
-                     name: f,
-                     checked: false
-                   }
-                 });
+                 this.files = response.body.files.map(f => ({
+                   name: f,
+                   checked: false
+                 }));
                });
        },
        deleteFiles: function (event) {
@@ -66,7 +64,7 @@
              .filter(f => f.checked )
              .map(f => f.name )
              .forEach(
-               file => this.$http.delete("api1/" + file));
+               file => this.$http.delete("v1/" + file));
 
          this.getFiles();
        }
