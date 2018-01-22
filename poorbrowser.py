@@ -35,12 +35,12 @@ def serve_file(filename):
 
         if created:
             return (
-                jsonify({'result': 'created'}),
+                jsonify({'created': filename}),
                 status.HTTP_201_CREATED
             )
         else:
             return (
-                jsonify({'result': 'ok'}),
+                jsonify({'overwritten': filename}),
             )
 
     def delete_file():
@@ -57,7 +57,7 @@ def serve_file(filename):
             )
         else:
             return (
-                jsonify({'result': 'deleted'}),
+                jsonify({'deleted': filename}),
             )
 
     return {
