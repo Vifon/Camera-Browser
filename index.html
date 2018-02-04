@@ -133,6 +133,9 @@
          }
          return res;
        }, {});
+       Object.keys(filesByDate).forEach(
+         date => filesByDate[date].sort((a,b) => a.pretty < b.pretty)
+       );
        return [filesByDate, filesWithoutDate];
      },
      getFiles: function () {
