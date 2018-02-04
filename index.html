@@ -62,7 +62,8 @@
       ></image-list>
 
       <div class="footer">
-        <label>
+        <input type="button" @click="getFiles" value="Refresh">
+        <label v-if="forDeletion.length > 0">
           <input type="button" @click="deleteFiles" value="Delete!">
           {{ forDeletion }}
         </label>
