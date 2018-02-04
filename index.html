@@ -108,6 +108,7 @@
    },
    methods: {
      groupFiles: function(files) {
+       var filesWithoutDate = [];
        var filesByDate = files.reduce((res, file) => {
          var match = file.name.match(
            /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/
@@ -123,11 +124,11 @@
            }
          } else {
            file.pretty = file.name;
-           this.otherFiles.push(file);
+           filesWithoutDate.push(file);
          }
          return res;
        }, {});
-       return filesByDate;
+       return [filesByDate, filesWithoutDate];
      },
      getFiles: function () {
        this.$http.get("v1/")
@@ -137,7 +138,7 @@
                  name: f,
                  checked: false
                }));
-               this.files = this.groupFiles(files);
+               [this.files, this.otherFiles] = this.groupFiles(files);
              });
      },
      deleteFiles: function (event) {
