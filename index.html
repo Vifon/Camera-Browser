@@ -10,29 +10,61 @@
      a {
        text-decoration: none;
      }
+     a:hover {
+       color: orange;
+     }
+
+     ul.image-list {
+       padding-left: 0;
+       float: left;
+     }
+
+     .footer {
+       clear: both;
+     }
+
+     .image-list li {
+       list-style-type: none;
+     }
+
+     img.preview {
+       position: fixed;
+       right: 1em;
+       top: 1em;
+       display: none;
+       max-width: 800px;
+     }
+
+     @media screen and (min-width: 980px) {
+       img.preview {
+         display: block;
+       }
+     }
+
+     body {
+       margin: 1em;
+     }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
 
   <body>
     <div id="app">
-      <div>
-        <ul>
-          <li v-for="file in files">
-            <label :class="{ 'removed': file.checked }">
-              <input type="checkbox"
-                     v-model="file.checked"
-                     :value="file.name">
-              <a :href="'files/' + file.name">{{ file.name }}</a>
-            </label>
-          </li>
-        </ul>
-      </div>
+      <img class="preview" :src="preview">
 
-      <div>
+      <image-list v-for="day in Object.keys(files).sort().reverse()"
+                  :files="files[day]"
+                  :title="day"
+      ></image-list>
+      <image-list
+        :files="otherFiles"
+        title="Others"
+      ></image-list>
+
+      <div class="footer">
         <label>
           <input type="button" @click="deleteFiles" value="Delete!">
-          {{ files.filter(f => f.checked).map(f => f.name) }}
+          {{ [].concat.apply(Object.values(otherFiles), Object.values(files)).filter(f => f.checked).map(f => f.name) }}
         </label>
       </div>
     </div>
@@ -40,38 +72,91 @@
 
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
-  <script>
-   'use strict';
+<script>
+ 'use strict';
 
-   var app = new Vue({
-     el: '#app',
-     data: {
-       files: []
-     },
-     methods: {
-       getFiles: function () {
-         this.$http.get("v1/")
-             .then(
-               response => {
-                 this.files = response.body.files.map(f => ({
-                   name: f,
-                   checked: false
-                 }));
-               });
-       },
-       deleteFiles: function (event) {
-         this.files
-             .filter(f => f.checked )
-             .map(f => f.name )
-             .forEach(
-               file => this.$http.delete("v1/" + file));
-
-         this.getFiles();
-       }
-     },
-     created: function() {
-       return this.getFiles();
+ Vue.component('image-list', {
+   props: ['files', 'title'],
+   template:
+       `<div class="image-list">
+          <h2>{{ title }}</h2>
+          <ul>
+            <li v-for="file in files"
+                @mouseover="onFocusChange(file)">
+              <label :class="{ 'removed': file.checked }">
+                <input type="checkbox"
+                       v-model="file.checked"
+                       :value="file.name">
+                  <a :href="'files/' + file.name">{{ file.pretty }}</a>
+              </label>
+            </li>
+          </ul>
+        </div>`,
+   methods: {
+     onFocusChange: function(file) {
+       this.$root.$emit('changePreview', file);
      }
-   });
-  </script>
+   }
+ });
+
+ var app = new Vue({
+   el: '#app',
+   data: {
+     files: {},
+     otherFiles: [],
+     preview: ""
+   },
+   methods: {
+     groupFiles: function(files) {
+       var filesByDate = files.reduce((res, file) => {
+         var match = file.name.match(
+           /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/
+         );
+         if (match) {
+           var [,y,m,d,H,M,S] = match;
+           var key = [y,m,d].join("-");
+           file.pretty = H + ":" + M + "." + S;
+           if (res[key]) {
+             res[key].push(file);
+           } else {
+             res[key] = [file];
+           }
+         } else {
+           file.pretty = file.name;
+           this.otherFiles.push(file);
+         }
+         return res;
+       }, {});
+       return filesByDate;
+     },
+     getFiles: function () {
+       this.$http.get("v1/")
+           .then(
+             response => {
+               var files = response.body.files.map(f => ({
+                 name: f,
+                 checked: false
+               }));
+               this.files = this.groupFiles(files);
+             });
+     },
+     deleteFiles: function (event) {
+       this.files
+           .filter(f => f.checked )
+           .map(f => f.name )
+           .forEach(
+             file => this.$http.delete("v1/" + file));
+
+       this.getFiles();
+     },
+     changePreview: function (file) {
+       this.preview = 'files/' + file.name;
+     }
+   },
+   created: function() {
+     this.$root.$on('changePreview', this.changePreview);
+     return this.getFiles();
+   }
+ });
+</script>
 </html>
