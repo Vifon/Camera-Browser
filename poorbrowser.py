@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, send_from_directory, safe_join, jsonify, request
+from flask import Flask, render_template, send_from_directory, safe_join, jsonify, request, redirect, url_for
 from flask.ext.api import status
 import os
 
@@ -22,6 +22,10 @@ def list_files():
             "files": sort(f for f in os.listdir(".")
                           if not os.path.isdir(f)),
         })
+
+@app.route("/files/<filename>")
+def serve_file_directly(filename):
+    return redirect(url_for('serve_file', filename=filename))
 
 @app.route("/v1/<filename>", methods=['GET', 'DELETE', 'PUT'])
 def serve_file(filename):
