@@ -64,7 +64,7 @@
       <div class="footer">
         <label>
           <input type="button" @click="deleteFiles" value="Delete!">
-          {{ [].concat.apply(Object.values(otherFiles), Object.values(files)).filter(f => f.checked).map(f => f.name) }}
+          {{ forDeletion }}
         </label>
       </div>
     </div>
@@ -156,6 +156,15 @@
    created: function() {
      this.$root.$on('changePreview', this.changePreview);
      return this.getFiles();
+   },
+   computed: {
+     forDeletion: function () {
+       return [].concat.apply(
+         Object.values(this.otherFiles),
+         Object.values(this.files))
+                .filter(f => f.checked)
+                .map(f => f.name);
+     }
    }
  });
 </script>
