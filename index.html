@@ -84,7 +84,13 @@
      props: ['files', 'title'],
      template:
          `<div class="image-list">
-            <span class="image-group">{{ title }}</span>
+            <label>
+              <input type="checkbox"
+                     :indeterminate.prop="!allChecked && !noneChecked"
+                     v-model="allChecked"
+                     @click="toggleAll">
+              <span class="image-group">{{ title }}</span>
+            </label>
             <ul>
               <li v-for="file in files"
                   @mouseover="onFocusChange(file)">
@@ -100,6 +106,18 @@
      methods: {
        onFocusChange: function (file) {
          this.$root.$emit('changePreview', file);
+       },
+       toggleAll: function () {
+         var checked = this.allChecked;
+         this.files.forEach(f => f.checked = !checked);
+       }
+     },
+     computed: {
+       allChecked: function () {
+         return this.files.every(f => f.checked);
+       },
+       noneChecked: function () {
+         return this.files.every(f => !f.checked);
        }
      }
    });
