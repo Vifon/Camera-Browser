@@ -87,7 +87,7 @@
          `<div class="image-list">
             <label>
               <input type="checkbox"
-                     :indeterminate.prop="!allChecked && !noneChecked"
+                     :indeterminate.prop="someChecked"
                      v-model="allChecked"
                      @click="toggleAll">
               <span class="image-group">{{ title }}</span>
@@ -119,6 +119,9 @@
        },
        noneChecked: function () {
          return this.files.every(f => !f.checked);
+       },
+       someChecked: function () {
+         return !this.allChecked && !this.noneChecked;
        }
      }
    });
