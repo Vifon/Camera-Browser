@@ -150,9 +150,7 @@
              });
      },
      deleteFiles: function (event) {
-       this.files
-           .filter(f => f.checked )
-           .map(f => f.name )
+       this.forDeletion
            .forEach(
              file => this.$http.delete("v1/" + file));
 
