@@ -49,5 +49,5 @@ def flaskrun(app,
         debug=options.debug,
         host=options.host,
         port=int(options.port),
-        **kwargs,
+        **kwargs
     )
