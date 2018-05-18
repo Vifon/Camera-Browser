@@ -11,9 +11,12 @@ except ImportError:
 
 app = Flask(__name__)
 
+@app.route("/<filename>")
+def devel_serve(filename):
+    return send_from_directory(os.getcwd(), filename)
 @app.route("/")
 def index():
-    return send_from_directory(os.getcwd(), "index.html")
+    return devel_serve("index.html")
 
 @app.route("/v1/")
 def list_files():
