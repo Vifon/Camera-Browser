@@ -3,12 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <title>Confirm deletion</title>
+    <style>
+     body {
+       text-align: center;
+     }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
     <div id="app">
       <p>{{ status }}: "{{ file }}"</p>
-      <input name="confirm" type="button" value="Delet This!" @click="deleteFile" />
+      <div>
+        <img class="preview" :src="'files/' + file">
+      </div>
+      <div>
+        <input name="confirm" type="button" value="Delet This!" @click="deleteFile" />
+      </div>
     </div>
   </body>
 
